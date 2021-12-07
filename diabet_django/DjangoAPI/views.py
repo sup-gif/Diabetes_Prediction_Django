@@ -10,10 +10,10 @@ import os
 from pathlib import Path
 
 def home(request):
-    return render(request, "./templates/DjangoAPI/home.html")
+    return render(request, "./DjangoAPI/home.html")
 
 def predict(request):
-    return render(request, "./templates/DjangoAPI/predict.html")
+    return render(request, "./DjangoAPI/predict.html")
 
 def result(request):
     data = pd.read_csv("./diabetes.csv")
@@ -42,4 +42,4 @@ def result(request):
     else:
         result1 = "Negative"
 
-    return render(request, "predict.html",{"result2":result1})
+    return render(request, "./DjangoAPI/predict.html",{"result2":result1})

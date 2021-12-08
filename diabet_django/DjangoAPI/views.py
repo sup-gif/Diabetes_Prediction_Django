@@ -1,45 +1,24 @@
-
-from django.shortcuts import render
+from django.http import JsonResponse
+from .apps import DiabetAppConfig
+from rest_framework.views import APIView
+from .apps import *
+import numpy as np
 import pandas as pd
-import seaborn as sn
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-import os
-from pathlib import Path
 
-def home(request):
-    return render(request, "./DjangoAPI/home.html")
+from rest_framework.response import Response
 
-def predict(request):
-    return render(request, "./DjangoAPI/predict.html")
 
-def result(request):
-    data = pd.read_csv("./diabetes.csv")
+class DjangoAPIView(APIView):
+    def post(self, request):
+        """Handle HTML POST request"""
+        #data = request.data
+        glucouse = request.GET.get["Glucose"]
+        insulin = request.GET.get["insulin"]
+        bmi = request.GET.get["BMI"]
+        age = request.GET.get["age"]
 
-    X = data.drop('Outcome', axis = 1)
-    Y = data["Outcome"]
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.30)
-
-    model = LogisticRegression()
-    model.fit(X_train, Y_train)
-
-    val1 = float(request.GET['n1'])
-    val2 = float(request.GET['n2'])
-    val3 = float(request.GET['n3'])
-    val4 = float(request.GET['n4'])
-    val5 = float(request.GET['n5'])
-    val6 = float(request.GET['n6'])
-    val7 = float(request.GET['n7'])
-    val8 = float(request.GET['n8'])
-
-    pred = model.predict([[val1, val2, val3, val4, val5, val6, val7, val8]])
-
-    result1 = ""
-    if pred==[1]:
-        result1 = "Positive"
-    else:
-        result1 = "Negative"
-
-    return render(request, "./DjangoAPI/predict.html",{"result2":result1})
+        prediction = DiabetAppConfig.model.predict([[glucouse, insulin, bmi , age]]
+                                                   )
+        response_dict = {"Predicted diabet": prediction}
+        print(response_dict)
+        return Response(response_dict, status=200)
